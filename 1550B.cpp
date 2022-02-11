@@ -1,0 +1,31 @@
+#include <bits/stdc++.h>
+// #include <chrono>
+using namespace std;
+// using namespace std::chrono;
+// typedef long long int ll;
+
+int main(int argc, char const *argv[])
+{
+    // auto start = high_resolution_clock::now();
+    // freopen(".\\c++\\_input.txt", "r", stdin);
+    // freopen(".\\c++\\_output.txt", "w", stdout);
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    // cout << setprecision(3) << fixed;
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        int n, a, b;
+        string s;
+        cin >> n >> a >> b >> s;
+        int m = unique(s.begin(), s.end()) - s.begin();
+        cout << a * n + max(n * b, (m / 2 + 1) * b) << endl;
+    }
+
+    // auto stop = high_resolution_clock::now();
+    // auto duration = duration_cast<microseconds>(stop - start);
+    // cout << "Time taken by function: " << duration.count() << " microseconds" << endl;
+    return 0;
+}

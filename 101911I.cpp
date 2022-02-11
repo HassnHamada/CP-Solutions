@@ -1,0 +1,42 @@
+#include <bits/stdc++.h>
+// #include <chrono>
+using namespace std;
+// using namespace std::chrono;
+typedef long long int ll;
+
+// const int N = 2e3 + 10;
+// double dp[N][N];
+
+void run()
+{
+    int n, mn = INT32_MAX, mx = 0;
+    cin >> n;
+    for (int i = 0, v; i < n; i++)
+    {
+        cin >> v;
+        mx = max(v, mx);
+        mn = min(v, mn);
+    }
+    cout << mx - mn - n + 1 << endl;
+}
+int main(int argc, char const *argv[])
+{
+    // auto start = high_resolution_clock::now();
+    // freopen(".\\_input.txt", "r", stdin);
+    // freopen(".\\_output.txt", "w", stdout);
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    // cout << setprecision(10) << fixed;
+    int test = 1;
+    // cin >> t;
+    while (test--)
+    {
+        run();
+    }
+
+    // auto stop = high_resolution_clock::now();
+    // auto duration = duration_cast<microseconds>(stop - start);
+    // cout << "Time taken by function: " << duration.count() << " microseconds" << endl;
+    return 0;
+}

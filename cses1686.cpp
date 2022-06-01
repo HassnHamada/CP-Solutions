@@ -1,5 +1,4 @@
-// #include <bits/stdc++.h>
-#include "stdc++.h"
+#include <bits/stdc++.h>
 using namespace std;
 typedef long long int ll;
 
@@ -12,6 +11,7 @@ stack<int> stk;
 
 void dfs(int c)
 {
+    // cout << "IN " << c << endl;
     low[c] = ids[c] = id++;
     onStk[c] = true;
     stk.push(c);
@@ -34,12 +34,14 @@ void dfs(int c)
             stk.pop();
             onStk[t] = false;
             low[t] = low[c];
+            // cout << c << " " << t << " " << low[c] << " " << low[t] << endl;
             if (t == c)
             {
                 break;
             }
         }
     }
+    // cout << "OUT " << c << endl;
 }
 
 void tarjan()
@@ -124,8 +126,8 @@ void run()
 
 int main(int argc, char const *argv[])
 {
-    // freopen(".\\_input.txt", "r", stdin);
-    // freopen(".\\_output.txt", "w", stdout);
+    freopen(".\\_input.txt", "r", stdin);
+    freopen(".\\_output.txt", "w", stdout);
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
     cout.tie(NULL);

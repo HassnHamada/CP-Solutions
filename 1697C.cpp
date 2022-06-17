@@ -6,32 +6,6 @@ const int N = 1e5 + 10, M = 3, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
 int n, acc[M][N];
 char sss[N], ttt[N];
 
-// bool work(int i, int j)
-// {
-//     // cout << i << " " << j << endl;
-//     if (i == n)
-//     {
-//         return true;
-//     }
-//     if (sss[i] == ttt[i])
-//     {
-//         return work(i + 1, i + 1);
-//     }
-//     if (j < n - 1 && work(i, j + 1))
-//     {
-//         return true;
-//     }
-//     if (j >= i && j < n - 1 && ((sss[j] == 'a' && sss[j + 1] == 'b') || (sss[j] == 'b' && sss[j + 1] == 'c')))
-//     {
-//         swap(sss[j], sss[j + 1]);
-//         if (work(i, j - 1))
-//         {
-//             return true;
-//         }
-//         swap(sss[j], sss[j + 1]);
-//     }
-//     return false;
-// }
 
 void run()
 {

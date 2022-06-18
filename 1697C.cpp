@@ -6,38 +6,27 @@ const int N = 1e5 + 10, M = 3, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
 int n, acc[M][N];
 char sss[N], ttt[N];
 
-
+// TODO
 void run()
 {
-    scanf("%d%s%s", &n, sss + 1, ttt + 1);
-    for (int i = 1; i <= n; i++)
+    scanf("%d%s%s", &n, sss, ttt);
+    bool ok = count(sss, sss + n, 'b') == count(sss, sss + n, 'b');
+    for (int i = 0, j = 0; ok && i < n; i++)
     {
-        for (int j = 0; j < M; j++)
+        if (sss[i] == 'b')
         {
-            acc[j][i] = acc[j][i - 1];
+            continue;
         }
-        acc[sss[i] - 'a'][i] += 1;
-    }
-    bool ok = true;
-    for (int i = 1; i <= n; i++)
-    {
-        if (sss[i] != ttt[i])
+        while (ttt[j] == 'b')
         {
-            int *it = acc[ttt[i] - 'a'];
-            int j = *lower_bound(it, it + n + 1, 1);
-            if (ttt[i] == 'a' || acc[(ttt[i] - 'a' + 1) % M][j] != 0)
-            {
-                ok = false;
-            }
-            else
-            {
-                swap(sss[i], sss[j]);
-            }
+            j += 1;
         }
-        acc[sss[i] - 'a'][i] -= 1;
+        if (sss[i] != ttt[j])
+        {
+            /* code */
+        }
+        
     }
-
-    // printf(work(0, 0) ? "YES\n" : "NO\n");
 }
 
 int main()

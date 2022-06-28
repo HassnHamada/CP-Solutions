@@ -11,12 +11,9 @@ for _ in range(t):
     # n = int(input())
     n, s = map(int, input().split())
     inp = list(map(int, input().split()))
-    acc = [inp[0]]
+    acc = [0]
     for i in inp:
         acc.append(acc[-1] + i)
-    ans = -1
-    if acc[-1] >= s:
-        ans= float('inf')
-        for i in range(n-1, 0, -1):
-            pass
-    print(ans)
+    print(min(n - i + bisect_left(acc, acc[i] - s)
+              for i in range(n, 0, -1) if acc[i] >= s)
+          if acc[-1] >= s else -1)

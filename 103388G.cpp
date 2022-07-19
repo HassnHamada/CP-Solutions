@@ -1,71 +1,102 @@
 #include <bits/stdc++.h>
-#include <iostream>
-#include <map>
 using namespace std;
-typedef long long int ll;
+typedef long long ll;
 
-const ll N = 1e15 + 10;
+const int N = 1e2 + 10, M = 10, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
+
+ll dp[N];
+
+ll calc(string &s, int i = 0)
+{
+    if (i == (int)s.size())
+    {
+        return 1;
+    }
+    if (~dp[i])
+    {
+        return dp[i];
+    }
+    if (s[i] == 'B')
+    {
+        return dp[i] = calc(s, i + 1);
+    }
+    return dp[i] = calc(s, i + 1) + calc(s, i + 2);
+}
+
+set<ll> vis;
+vector<ll> nums;
+bool solve(ll n, vector<int> &out)
+{
+    if (n == 1)
+    {
+        return true;
+    }
+    if (vis.find(n) != vis.end())
+    {
+        return false;
+    }
+    vis.insert(n);
+    for (int i = (int)nums.size() - 1; i; i--)
+    {
+        if (n % nums[i] == 0 && solve(n / nums[i], out))
+        {
+            out.push_back(i);
+            return true;
+        }
+    }
+    return false;
+}
 
 void run()
 {
-    map<string, ll> s2n;
-    map<ll, string> n2s;
-    s2n.emplace("A", 2);
-    n2s.emplace(2, "A");
-    string s = "AA";
-    ll n = 3;
-    while (n < N)
+    string s;
+    for (int i = 0;; i++)
     {
-        s2n.emplace(s, n);
-        n2s.emplace(n, s);
-        s.pop_back();
-        n += s2n.find(s)->second;
-        s.push_back('A');
-        s.push_back('A');
-    }
-    cin >> n;
-    s.clear();
-    for (auto &&i : n2s)
-    {
-        while (n % i.first == 0)
+        s.push_back('B');
+        memset(dp, -1, sizeof(dp[0]) * (i + 1));
+        ll res = calc(s);
+        if (res > 1e15)
         {
-            s.append(i.second);
-            s.push_back('B');
-            n /= i.first;
+            break;
         }
+        nums.push_back(res);
+        s.pop_back();
+        s.push_back('A');
     }
-    cout << (n == 1 ? s : "IMPOSSIBLE") << "\n";
+    ll n;
+    scanf("%lld", &n);
+    vector<int> ans;
+    if (solve(n, ans))
+    {
+        s.clear();
+        reverse(ans.begin(), ans.end());
+        for (auto &&i : ans)
+        {
+            for (int j = 0; j < i; j++)
+            {
+                s.push_back('A');
+            }
+            s.push_back('B');
+        }
+        printf("%s", s.c_str());
+    }
+    else
+    {
+        printf("IMPOSSIBLE\n");
+    }
 }
-int main(int argc, char const *argv[])
+
+int main()
 {
-    // freopen(".\\_input.txt", "r", stdin);
-    // freopen(".\\_output.txt", "w", stdout);
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    cout.tie(NULL);
-    // cout << setprecision(10) << fixed;
+    // freopen("_input.txt", "r", stdin);
+    // freopen("_output.txt", "w", stdout);
     int t = 1;
-    // cin >> t;
+    // scanf("%d", &t);
     while (t--)
+    // while (scanf("%d", &n), n)
     {
         run();
     }
+
     return 0;
 }
-// 1    ->  B
-// 2    ->  AB
-// 3    ->  AAB
-// 4    ->  ABAB
-// 5    ->  AAAB
-// 6    ->  AABAB
-// 7    ->  IMPOSSIBLE
-// 8    ->  AAAAB
-// 9    ->  AABAAB
-//  A   A   A   A   B
-//  A       A   A   B
-//  A   A       A   B
-//  A   A   A       B
-//  A   A   A   A    
-//  A       A       B
-//  A       A   A    
-//  A   A       A    

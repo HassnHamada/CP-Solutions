@@ -64,7 +64,6 @@ void run()
         nums.insert(i);
     }
     bool ok = true;
-    // int v = min(n, m), w = max(n, m), c = -1;
     int v = min(n, m), w = max(n, m);
     vector<int> aaa, bbb;
     if (w > v)
@@ -285,8 +284,8 @@ void run()
 
 int main()
 {
-    freopen("_input.txt", "r", stdin);
-    freopen("_output.txt", "w", stdout);
+    freopen("magic.in", "r", stdin);
+    // freopen("_output.txt", "w", stdout);
     int t = 1;
     // scanf("%d", &t);
     while (t--)
@@ -297,3 +296,68 @@ int main()
 
     return 0;
 }
+
+
+// test.py
+// from collections import Counter
+// from functools import reduce
+// from itertools import combinations, combinations_with_replacement
+// from os import system
+// from random import randint, choice
+// import sys
+// from time import perf_counter_ns
+
+// stdout = sys.stdout
+// stdin = sys.stdin
+
+// N = 1000
+
+// while True:
+//     with open("_input.txt", "w") as fout:
+//         sys.stdout = fout
+//         n, m = randint(1, N), randint(1, N)
+//         x, y = randint(1, n), randint(1, m)
+//         print(n, m, x, y)
+
+//     # system("_ok.exe")
+//     tic = perf_counter_ns()
+//     system("_out.exe")
+//     toc = perf_counter_ns()
+
+//     # with open("_output.txt", "r") as bad, open("_ok.txt", "r") as ok:
+//     #     sys.stdout = stdout
+//     #     for i, (l1, l2) in enumerate(zip(bad, ok)):
+//     #         try:
+//     #             assert l1 == l2
+//     #         except AssertionError:
+//     #             raise AssertionError(f"{i + 1}\n\t{l1}\t{l2}")
+//     #     for l in bad:
+//     #         assert False
+//     #     for l in ok:
+//     #         assert False
+
+//     print(f"DONE in {(toc-tic)//1000000}ms", file=stdout)
+//     assert (toc-tic)//1000000 < 1000
+
+//     with open("_output.txt", "r") as fin:
+//         sys.stdin = fin
+//         sys.stdout = stdout
+//         res = input()
+//         if len(res) == 2:
+//             res = int(res)
+//             assert res == -1
+//             # l = set(range(1, n * m + 1))
+//             # for i in combinations(l, n):
+//             #     i = set(i)
+//             #     s = sum(i)
+//             #     for j in combinations(l - i, m - 1):
+//             #         j = sum(j)
+//             #         assert j >= s or s - j not in i
+//         else:
+//             mat = [list(map(int, res.split()))]
+//             mat.extend(list(list(map(int, input().split()))
+//                        for _ in range(n - 1)))
+//             assert sum(mat[x-1]) == sum(mat[i][y-1] for i in range(n))
+//             assert all(1 <= j <= n * m for i in mat for j in i)
+//             assert Counter(j for i in mat for j in i).most_common(1)[0][1] == 1
+//     # break

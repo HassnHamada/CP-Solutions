@@ -29,7 +29,6 @@ void shrink()
 
 void manacher()
 {
-    // extend();
     int n = strlen(str), c = 1, r = 1;
     memset(ppp, 0, n * sizeof(ppp[0]));
     for (int i = 2; i < n; i++)

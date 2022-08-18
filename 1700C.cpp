@@ -4,41 +4,42 @@ typedef long long ll;
 
 const int N = 2e5 + 10, M = 10, L = 2, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
 
-ll arr[N];
+ll arr[N], rev[N];
 int n;
 
-ll calc()
+ll calc(ll *ptr)
 {
-    ll ret = abs(arr[0]);
-    for (ll i = 1, v = max(-arr[0], 0ll); i < n; i++)
+    ll ret = 0;
+    for (int i = 0; i < n - 1; i++)
     {
-        ll w = arr[i] + v;
-        ret += abs(w) * (w < 0 ? 2 : 1);
-        v -= w;
+        if (ptr[i] > ptr[i + 1])
+        {
+            ll v = ptr[i] - ptr[i + 1];
+            ptr[0] -= v;
+            ret += v;
+        }
+    }
+    if (ptr[0] < 0)
+    {
+        ret += ptr[n - 1] - 2 * ptr[0];
+    }
+    else
+    {
+        ret += ptr[n - 1];
     }
     return ret;
 }
 
 void run()
 {
-    ll mn = INT64_MAX;
     scanf("%d", &n);
     for (int i = 0; i < n; i++)
     {
         scanf("%lld", arr + i);
-        mn = min(mn, arr[i]);
+        rev[n - i - 1] = arr[i];
     }
-    if (mn > 0)
-    {
-        for (int i = 0; i < n; i++)
-        {
-            arr[i] -= mn;
-        }
-    }
-    ll ans = calc();
-    reverse(arr, arr + n);
-    ans = min(ans, calc());
-    printf("%lld\n", ans + max(mn, 0ll));
+    ll ans = min(calc(arr), calc(rev));
+    printf("%lld\n", ans);
 }
 
 int main()

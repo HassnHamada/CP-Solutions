@@ -4,52 +4,36 @@ typedef long long ll;
 
 const int N = 2e5 + 10, M = 20, L = 4, MOD = 998244353, HV = 151, INF = 0x3f3f3f3f;
 
-ll ans[N], prv[N], cur[N];
+int ans[N], prv[N], cur[N];
 
 void run()
 {
     int n, k;
     scanf("%d%d", &n, &k);
     prv[0] = 1;
-    set<pair<int, int>> q;
-    q.emplace(0, k);
-    while (!q.empty())
+    for (int i = 0; i < n; i += k++)
     {
-        auto f = *q.begin();
-        q.erase(q.begin());
-        int cn = f.first;
-        int ck = f.second;
-        for (int i = cn + ck; i <= n; i += ck)
+        for (int j = i + k; j <= n; j++)
         {
-            cur[i] = (cur[i] + prv[cn]) % MOD;
-            q.emplace(i, ck + 1);
-        }
-        if (q.empty() || (q.begin()->second) == ck + 1)
-        {
-            for (int i = 1; i <= n; i++)
+            (cur[j] = prv[j - k]) %= MOD;
+            if (j - k >= i + k)
             {
-                ans[i] = (ans[i] + cur[i]) % MOD;
+                (cur[j] += cur[j - k]) %= MOD;
             }
-            swap(cur, prv);
-            memset(cur, 0, sizeof(cur[0]) * (n + 1));
-            for (int i = 1; i <= n; i++)
-            {
-                std::printf("%lld%c", ans[i], " \n"[i == n]);
-            }
+            (ans[j] += cur[j]) %= MOD;
         }
-
+        swap(cur, prv);
     }
-
     for (int i = 1; i <= n; i++)
     {
-        std::printf("%lld%c", ans[i], " \n"[i == n]);
+        std::printf("%d%c", ans[i], " \n"[i == n]);
     }
 }
 
 int main()
 {
-    freopen("_input.txt", "r", stdin);
-    freopen("_output.txt", "w", stdout);
+    // freopen("_input.txt", "r", stdin);
+    // freopen("_output.txt", "w", stdout);
     int t = 1;
     // scanf("%d", &t);
     while (t--)

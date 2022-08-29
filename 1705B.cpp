@@ -2,8 +2,9 @@
 using namespace std;
 typedef long long ll;
 
-const int N = 1e5 + 10, M = 32, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
-int arr[N], pos[N];
+const int N = 2e5 + 10, M = 10, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
+
+int arr[N];
 
 void run()
 {
@@ -12,30 +13,33 @@ void run()
     for (int i = 0; i < n; i++)
     {
         scanf("%d", arr + i);
-        pos[arr[i]] = i;
     }
-    // for (int i = 0; i < n; i++)
-    // {
-    //     cout << pos[i] << " ";
-    // }
-    // cout << endl;
-    int ans = 1;
-    for (int i = 1, l = pos[0], r = l; i < n; i++)
+    ll ans = 0;
+    int i = 0, j = 1;
+    while (true)
     {
-        if (pos[i] < l)
+        while (i < n - 1 && arr[i] == 0)
         {
-            l = pos[i];
+            i += 1;
         }
-        else if (pos[i] > r)
+        j = max(j, i + 1);
+        while (j < n && arr[j] != 0)
         {
-            r = pos[i];
+            j += 1;
         }
-        else
+        if (j == n)
         {
-            ans = ans * (r - l + 1ll - i) % MOD;
+            break;
         }
+        arr[i] -= 1;
+        arr[j] += 1;
+        ans += 1;
     }
-    printf("%d\n", ans);
+    for (int i = 0; i < n - 1; i++)
+    {
+        ans += arr[i];
+    }
+    printf("%lld\n", ans);
 }
 
 int main()

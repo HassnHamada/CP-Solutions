@@ -1,54 +1,83 @@
 #include <bits/stdc++.h>
-// #include <chrono>
 using namespace std;
-// using namespace std::chrono;
-// typedef long long int ll;
+typedef long long ll;
 
-int main(int argc, char const *argv[])
+const int N = 5e3 + 10, M = 2e2 + 10, MOD = 5e6, HV = 151, INF = 0x3f3f3f3f;
+
+struct Suffix
 {
-    // auto start = high_resolution_clock::now();
-    // freopen(".\\c++\\_input.txt", "r", stdin);
-    // freopen(".\\c++\\_output.txt", "w", stdout);
+    int i;
+    pair<int, int> r;
+    bool operator<(const Suffix &other) const
+    {
+        if (this->r.first == other.r.first)
+        {
+            return this->r.second < other.r.second;
+        }
+        return this->r.first < other.r.first;
+    }
+} arr[N];
+
+char str[N];
+
+void calcSuffix()
+{
+    int n = strlen(str);
+    for (int i = 0; i < n; i++)
+    {
+        arr[i].i = i;
+        arr[i].r.first = str[i] - 'a';
+        arr[i].r.second = i + 1 < n ? str[i + 1] - 'a' : -1;
+    }
+    sort(arr, arr + n);
+    vector<int> ind(n);
+    for (int i = 2; i < n; i *= 2)
+    {
+        pair<int, int> prv = arr[0].r;
+        arr[0].r.first = ind[arr[0].i] = 0;
+        for (int j = 1; j < n; j++)
+        {
+            ind[arr[j].i] = j;
+            if (arr[j].r == prv)
+            {
+                arr[j].r.first = arr[j - 1].r.first;
+            }
+            else
+            {
+                prv = arr[j].r;
+                arr[j].r.first = arr[j - 1].r.first + 1;
+            }
+        }
+        for (int j = 0; j < n; j++)
+        {
+            arr[j].r.second = arr[j].i + i < n ? arr[ind[arr[j].i + i]].r.first : -1;
+        }
+        sort(arr, arr + n);
+    }
+}
+
+void run()
+{
     int n, k;
     scanf("%d%d", &n, &k);
-    vector<int> frq(26);
-    string s;
-    s.reserve(2 * k);
-    cin >> s;
-    for (auto &&i : s)
+    scanf("%s", str);
+    calcSuffix();
+    for (int i = 0; i < n; i++)
     {
-        frq[i - 'a']++;
+        printf("%s\n", str + arr[i].i);
     }
-    char c = s[0], t = 0;
-    for (int i = c - 'a' + 1; i < 26; i++)
-    {
-        t += frq[i];
-    }
-    while (t)
-    {
-        char l = s[s.size() - 1];
-        if (l > c)
-        {
-            t -= 1;
-        }
-        s.pop_back();
-    }
-    while (s.size() > 1 && s[s.size() - 1] == c)
-    {
-        s.pop_back();
-    }
+}
 
-    while (s.size() < k)
+int main()
+{
+    freopen("_input.txt", "r", stdin);
+    freopen("_output.txt", "w", stdout);
+    int t = 1;
+    // scanf("%d", &t);
+    while (t--)
+    // while (scanf("%d", &n), n)
     {
-        s += s;
+        run();
     }
-    while (s.size() > k)
-    {
-        s.pop_back();
-    }
-    printf("%s\n", s.c_str());
-    // auto stop = high_resolution_clock::now();
-    // auto duration = duration_cast<microseconds>(stop - start);
-    // cout << "Time taken by function: " << duration.count() << " microseconds" << endl;
     return 0;
 }

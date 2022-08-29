@@ -2,9 +2,10 @@
 using namespace std;
 typedef long long ll;
 
-const int N = 3e3 + 10, M = 10, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
+const int N = 1e5 + 10, M = 64, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
 
-int arr[N];
+ll arr[N];
+ll dp[N][M];
 
 void run()
 {
@@ -12,20 +13,17 @@ void run()
     scanf("%d%d", &n, &k);
     for (int i = 0; i < n; i++)
     {
-        scanf("%d", arr + i);
+        scanf("%lld", arr + i);
     }
-    int ans = INF;
-    for (int i = 1; i <= arr[0]; i++)
+    memset((ll *)(dp + n), 0, sizeof(dp[0]));
+    for (int i = n - 1; ~i; i--)
     {
-        int cmx = -INF;
-        for (int j = 0; j < n; j++)
+        for (int j = 0; j < M - 1; j++)
         {
-            int p = min(k, arr[j] / i);
-            cmx = max(cmx, arr[j] / p);
+            dp[i][j] = max((arr[i] >> j) + dp[i + 1][j] - k, (arr[i] >> (j + 1)) + dp[i + 1][j + 1]);
         }
-        ans = min(ans, cmx - i);
     }
-    printf("%d\n", ans);
+    printf("%lld\n", dp[0][0]);
 }
 
 int main()

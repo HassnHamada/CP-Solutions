@@ -2,30 +2,37 @@
 using namespace std;
 typedef long long ll;
 
-const int N = 3e3 + 10, M = 10, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
-
+const int N = 1e5 + 10, M = 32, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
 int arr[N];
+char ans[N];
 
 void run()
 {
-    int n, k;
-    scanf("%d%d", &n, &k);
+    int n, q;
+    scanf("%d%d", &n, &q);
     for (int i = 0; i < n; i++)
     {
         scanf("%d", arr + i);
     }
-    int ans = INF;
-    for (int i = 1; i <= arr[0]; i++)
+    int cq = 0;
+    for (int i = n - 1; ~i; i--)
     {
-        int cmx = -INF;
-        for (int j = 0; j < n; j++)
+        if (arr[i] <= cq)
         {
-            int p = min(k, arr[j] / i);
-            cmx = max(cmx, arr[j] / p);
+            ans[i] = '1';
         }
-        ans = min(ans, cmx - i);
+        else if (cq < q)
+        {
+            cq++;
+            ans[i] = '1';
+        }
+        else
+        {
+            ans[i] = '0';
+        }
     }
-    printf("%d\n", ans);
+    ans[n] = '\0';
+    printf("%s\n", ans);
 }
 
 int main()

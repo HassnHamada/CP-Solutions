@@ -1,118 +1,73 @@
 #include <bits/stdc++.h>
-// #include "stdc++.h"
 using namespace std;
-// typedef long long int ll;
+typedef long long ll;
 
-const int N = 1e5 + 10, EMP = -1;
-int n, m;
-bool vis[N];
-set<int> grf[N];
-vector<int> ans;
+const int N = 2e5 + 10, M = 2e2 + 10, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
 
-void getInp()
+int ans[N];
+deque<int> grf[N >> 1];
+pair<int, int> edg[N];
+bool usd[N];
+
+bool dfs(int cn, int cm)
 {
-    cin >> n >> m;
-    for (int i = 0, a, b; i < m; i++)
+    // cout << cn << " " << cm << endl;
+    ans[cm] = cn;
+    if (cm == 0)
     {
-        cin >> a >> b;
-        grf[a].insert(b);
-        grf[b].insert(a);
+        return cn == 1;
     }
-}
-
-int con(int c)
-{
-    vis[c] = true;
-    int ret = grf[c].size();
-    for (auto &&i : grf[c])
+    int sz = grf[cn].size();
+    for (int i = 0; i < sz; i++)
     {
-        if (!vis[i])
+        int v = grf[cn].back();
+        grf[cn].pop_back();
+        if (!usd[v])
         {
-            ret += con(i);
+            usd[v] = true;
+            if (dfs(edg[v].first == cn ? edg[v].second : edg[v].first, cm - 1))
+            {
+                return true;
+            }
+            usd[v] = false;
         }
+        grf[cn].push_front(v);
     }
-    return ret;
-}
-
-bool ok()
-{
-    bool ret = true;
-    for (int i = 1; i <= n; i++)
-    {
-        if (grf[i].size() % 2)
-        {
-            ret = false;
-        }
-    }
-    // vector<bool> vis(n + 1, false);
-    int res = con(1);
-    return ret && res % 2 == 0 && res / 2 == m;
-}
-
-bool dfs(int c)
-{
-    ans.push_back(c);
-    // if (c == 1)
-    // {
-    //     return m == 0;
-    // }
-    if (m == 0)
-    {
-        if (c == 1)
-        {
-            return true;
-        }
-        ans.pop_back();
-        return false;
-    }
-    set<int> tem(grf[c].begin(), grf[c].end());
-    for (int i : tem)
-    {
-        grf[c].erase(i);
-        // grf[i].erase(c);
-        m--;
-        if (dfs(i))
-        {
-            return true;
-        }
-        // grf[c].insert(i);
-        // grf[i].insert(c);
-        // m++;
-    }
-    ans.pop_back();
     return false;
 }
 
 void run()
 {
-    getInp();
-    if (ok())
+    int n, m;
+    scanf("%d%d", &n, &m);
+    for (int i = 0, u, v; i < m; i++)
     {
-        memset(vis, 0, sizeof(vis));
-        assert(dfs(1));
-        for (auto &&i : ans)
+        scanf("%d%d", &u, &v);
+        grf[u].push_back(i);
+        grf[v].push_back(i);
+        edg[i] = {u, v};
+    }
+    if (dfs(1, m))
+    {
+        for (int i = 0; i <= m; i++)
         {
-            cout << i << " ";
+            printf("%d%c", ans[i], " \n"[i == m]);
         }
-        cout << endl;
     }
     else
     {
-        cout << "IMPOSSIBLE\n";
+        printf("IMPOSSIBLE\n");
     }
 }
 
-int main(int argc, char const *argv[])
+int main()
 {
-    // freopen(".\\_input.txt", "r", stdin);
-    // freopen(".\\_output.txt", "w", stdout);
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    cout.tie(NULL);
-    // cout << setprecision(6) << fixed;
+    // freopen("_input.txt", "r", stdin);
+    // freopen("_output.txt", "w", stdout);
     int t = 1;
-    // cin >> t;
+    // scanf("%d", &t);
     while (t--)
+    // while (scanf("%d", &n), n)
     {
         run();
     }

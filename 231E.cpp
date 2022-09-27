@@ -175,6 +175,7 @@ ll my_pow(ll a, ll p)
     }
     return ret;
 }
+
 void calc(int n = 0, int p = -1)
 {
     clc[n] = blk[n] + (~p ? clc[p] : 0);

@@ -16,10 +16,10 @@ void run()
     }
     sort(arr, arr + n);
     int jj = n - 1, ans = 0;
-    while (jj >= 0 && 1ll * n * arr[jj] >= d)
+    while (jj >= 0 && 1ll * n * arr[jj] >= d + 1)
     {
         ans += 1;
-        n -= (d + arr[jj] - 1) / arr[jj];
+        n -= (d + arr[jj]) / arr[jj];
         jj -= 1;
         assert(n >= 0);
     }

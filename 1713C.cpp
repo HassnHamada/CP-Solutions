@@ -6,13 +6,24 @@ const int N = 2e5 + 10, M = 20, L = 4, MOD = 998244353, HV = 151, INF = 0x3f3f3f
 
 int ans[N];
 
-void recurse(int r) {
-	if (r < 0) return;
-	int s = sqrt(2*r); s *= s;
-	int l = s - r; recurse(l - 1);
-	for (; l <= r; l++, r--) {
-		ans[l] = r; ans[r] = l;
-	}
+// r = 4, s = 4
+void recurse(int r)
+{
+    if (r < 0)
+        return;
+    int s = 0;
+    while (s * s < r)
+    {
+        s += 1;
+    }
+    s *= s;
+    int l = s - r;
+    for (; l <= r; l++, r--)
+    {
+        ans[l] = r;
+        ans[r] = l;
+    }
+    recurse(l - 1);
 }
 
 void run()

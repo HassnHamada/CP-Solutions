@@ -2,38 +2,45 @@
 using namespace std;
 typedef long long ll;
 
-const int N = 2e5 + 10, M = 2e2 + 10, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
+const int N = 1e5 + 10, M = 2e2 + 10, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
 
-int ans[N];
-deque<int> grf[N >> 1];
-pair<int, int> edg[N];
-bool usd[N];
+int ans[N << 1], vis[N << 1], vid;
+vector<int> grf[N];
+pair<int, int> edg[N << 1];
 
-bool dfs(int cn, int cm)
+void dfs(int n)
 {
-    // cout << cn << " " << cm << endl;
-    ans[cm] = cn;
-    if (cm == 0)
+    vis[n] = vid;
+    for (auto &&i : grf[n])
     {
-        return cn == 1;
-    }
-    int sz = grf[cn].size();
-    for (int i = 0; i < sz; i++)
-    {
-        int v = grf[cn].back();
-        grf[cn].pop_back();
-        if (!usd[v])
+        int j = edg[i].first == n ? edg[i].second : edg[i].first;
+        if (vis[j] == vid)
         {
-            usd[v] = true;
-            if (dfs(edg[v].first == cn ? edg[v].second : edg[v].first, cm - 1))
-            {
-                return true;
-            }
-            usd[v] = false;
+            continue;
         }
-        grf[cn].push_front(v);
+        dfs(j);
     }
-    return false;
+}
+
+bool ok(int n)
+{
+    for (int i = 1; i <= n; i++)
+    {
+        if (grf[i].size() & 1)
+        {
+            return false;
+        }
+    }
+    vid++;
+    dfs(1);
+    for (int i = 1; i <= n; i++)
+    {
+        if (!grf[i].empty() && vis[i] != vid)
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 void run()
@@ -47,11 +54,36 @@ void run()
         grf[v].push_back(i);
         edg[i] = {u, v};
     }
-    if (dfs(1, m))
+    if (ok(n))
     {
-        for (int i = 0; i <= m; i++)
+        int sz = 0;
+        stack<int> stk;
+        stk.push(1);
+        vid++;
+        while (!stk.empty())
         {
-            printf("%d%c", ans[i], " \n"[i == m]);
+            int t = stk.top();
+            if (grf[t].empty())
+            {
+                stk.pop();
+                ans[sz++] = t;
+                continue;
+            }
+            int i = grf[t].back();
+            if (vis[i] == vid)
+            {
+                grf[t].pop_back();
+                continue;
+            }
+            int j = edg[i].first == t ? edg[i].second : edg[i].first;
+            stk.push(j);
+            vis[i] = vid;
+            grf[t].pop_back();
+        }
+        assert(sz == m + 1);
+        for (int i = 0; i < sz; i++)
+        {
+            printf("%d%c", ans[i], " \n"[i + 1 == sz]);
         }
     }
     else
@@ -62,8 +94,8 @@ void run()
 
 int main()
 {
-    // freopen("_input.txt", "r", stdin);
-    // freopen("_output.txt", "w", stdout);
+    freopen("_input.txt", "r", stdin);
+    freopen("_output.txt", "w", stdout);
     int t = 1;
     // scanf("%d", &t);
     while (t--)

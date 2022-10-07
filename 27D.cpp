@@ -72,15 +72,19 @@ void run()
     for (int i = 0; i < m; i++)
     {
         scanf("%d%d", &inp[i].first, &inp[i].second);
+        if (inp[i].second < inp[i].first)
+        {
+            swap(inp[i].first, inp[i].second);
+        }
     }
     for (int i = 0; i < m; i++)
     {
         for (int j = i + 1; j < m; j++)
         {
-            if ((inp[i].first < inp[j].first && inp[j].first < inp[i].second) ||
-                (inp[i].first < inp[j].second && inp[j].second < inp[i].second) ||
-                (inp[j].first < inp[i].first && inp[i].first < inp[j].second) ||
-                (inp[j].first < inp[i].second && inp[i].second < inp[j].second))
+            if (((inp[i].first < inp[j].first && inp[j].first < inp[i].second) &&
+                 (inp[i].first > inp[j].second || inp[j].second > inp[i].second)) ||
+                ((inp[i].first < inp[j].second && inp[j].second < inp[i].second) &&
+                 (inp[i].first > inp[j].first || inp[j].first > inp[i].second)))
             {
                 int a0 = i << 1, a1 = a0 + 1, b0 = j << 1, b1 = b0 + 1;
                 grf[a0].push_back(b1);
@@ -93,10 +97,6 @@ void run()
 
     if (ok(m))
     {
-        // for (int i = 0; i < m; i++)
-        // {
-        //     cout << cyc[(i << 1) + 1] << " " << cyc[i << 1] << endl;
-        // }
         for (int i = 0; i < m; i++)
         {
             printf(cyc[(i << 1) + 1] < cyc[i << 1] ? "i" : "o");

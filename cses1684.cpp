@@ -2,61 +2,86 @@
 using namespace std;
 typedef long long ll;
 
-const int N = 1e5 + 10, M = 10, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
+const int N = 2e5 + 10, M = 10, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
 
-int n, m, usd[N];
-pair<int, int> inp[N];
+vector<int> grf[N];
+int ids[N], low[N], cyc[N], id, cid;
+bool onStk[N];
+stack<int> stk;
 
-bool sadCat(int i);
-
-bool happyCat(int i, int v)
+void dfs(int c)
 {
-    int p = (v == abs(v) ? 1 : -1);
-    v = abs(v);
-    if (usd[v])
+    ids[c] = low[c] = id++;
+    stk.push(c);
+    onStk[c] = true;
+    for (auto &&i : grf[c])
     {
-        if (usd[v] == p)
+        if (ids[i] == -1)
         {
-            return sadCat(i - 1);
+            dfs(i);
         }
-        return false;
+        if (onStk[i])
+        {
+            low[c] = min(low[c], low[i]);
+        }
     }
-    usd[v] = p;
-    if (sadCat(i - 1))
+    if (ids[c] == low[c])
     {
-        return true;
+        cyc[c] = cid++;
+        while (!stk.empty())
+        {
+            int t = stk.top();
+            stk.pop();
+            onStk[t] = false;
+            cyc[t] = cyc[c];
+            low[t] = low[c];
+            if (t == c)
+            {
+                break;
+            }
+        }
     }
-    usd[v] = 0;
-    return false;
 }
 
-bool sadCat(int i = n - 1)
+bool ok(int n)
 {
-    return i < 0 || happyCat(i, inp[i].first) || happyCat(i, inp[i].second);
-}
-
-void getInp()
-{
-    scanf("%d%d\n", &n, &m);
+    memset(ids, -1, sizeof(ids[0]) * (n << 1));
+    memset(ids, -1, sizeof(ids[0]) * (n << 1));
+    for (int i = 0; i < (n << 1); i++)
+    {
+        if (ids[i] == -1)
+        {
+            dfs(i);
+        }
+    }
     for (int i = 0; i < n; i++)
     {
-        char a, c;
-        int b, d;
-        scanf("%c%d %c%d\n", &a, &b, &c, &d);
-        b *= (a == '+' ? 1 : -1);
-        d *= (c == '+' ? 1 : -1);
-        inp[i] = {b, d};
+        if (cyc[i << 1] == cyc[(i << 1) + 1])
+        {
+            return false;
+        }
     }
+    return true;
 }
 
 void run()
 {
-    getInp();
-    if (sadCat())
+    int n, m;
+    scanf("%d%d", &n, &m);
+    for (int i = 0; i < n; i++)
     {
-        for (int i = 1; i <= m; i++)
+        char c1, c2;
+        int d1, d2;
+        scanf("\n%c %d %c %d", &c1, &d1, &c2, &d2);
+        int a = ((d1 - 1) << 1) + (c1 == '+'), b = ((d2 - 1) << 1) + (c2 == '+');
+        grf[a ^ 1].push_back(b);
+        grf[b ^ 1].push_back(a);
+    }
+    if (ok(m))
+    {
+        for (int i = 0; i < m; i++)
         {
-            printf("%c%c", "-+"[usd[i] == 1], " \n"[i == m]);
+            printf("%c%c", cyc[(i << 1) + 1] < cyc[i << 1] ? '+' : '-', " \n"[i + 1 == m]);
         }
     }
     else
@@ -67,8 +92,8 @@ void run()
 
 int main()
 {
-    freopen("_input.txt", "r", stdin);
-    freopen("_output.txt", "w", stdout);
+    // freopen("_input.txt", "r", stdin);
+    // freopen("_output.txt", "w", stdout);
     int t = 1;
     // scanf("%d", &t);
     while (t--)

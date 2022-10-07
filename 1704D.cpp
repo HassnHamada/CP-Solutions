@@ -2,157 +2,57 @@
 using namespace std;
 typedef long long ll;
 
-const int N = 2e5 + 10, M = 10, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
+const int N = 2e5 + 10, M = 3, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
 
-vector<ll> arr[N];
-int n, m;
+vector<ll> arr[M];
 
-bool cmp(vector<ll> v1, vector<ll> v2)
+ll val(int ii)
 {
-    for (int i = 0; i < m - 2; i++)
+    ll n = arr[ii].size(), ret = 0;
+    for (int i = 1; i < n; i++)
     {
-        if (v1[i] == v2[i])
-        {
-            continue;
-        }
-        if (v1[i] < v2[i])
-        {
-            swap(v1, v2);
-        }
-        ll t = v1[i] - v2[i];
-        v1[i] -= t;
-        v1[i + 1] += 2 * t;
-        v1[i + 2] -= t;
+        ret += arr[ii][i] * (i + 1);
     }
-    bool ok = true;
-    for (int i = m - 2; ok && i < m; i++)
-    {
-        ok = v1[i] == v2[i];
-    }
-    return ok;
-}
-
-// bool cnv(vector<ll> &v1, vector<ll> &v2)
-// {
-//     for (int i = 0; i < m - 2; i++)
-//     {
-//         if (v1[i] == v2[i])
-//         {
-//             continue;
-//         }
-//         if (v1[i] < v2[i])
-//         {
-//             swap(v1, v2);
-//         }
-//         ll t = v1[i] - v2[i];
-//         v1[i] -= t;
-//         v1[i + 1] += 2 * t;
-//         v1[i + 2] -= t;
-//     }
-//     bool ok = true;
-//     for (int i = m - 2; ok && i < m; i++)
-//     {
-//         ok = v1[i] == v2[i];
-//     }
-//     return ok;
-// }
-
-ll count(vector<ll> &v1, vector<ll> &v2)
-{
-    ll ans = 0;
-    for (int i = 0; i < m; i++)
-    {
-        if (v1[i] == v2[i])
-        {
-            continue;
-        }
-        if (v1[i] < v2[i])
-        {
-            ll t = v2[i] - v1[i];
-            v2[i] -= t;
-            v2[i + 1] += 2 * t;
-            v2[i + 2] -= t;
-            // cout << i << " " << t << endl;
-            // ans += t;
-        }
-        else
-        {
-            ll t = v1[i] - v2[i];
-            cout << i << " " << t << endl;
-            v1[i] -= t;
-            v1[i + 1] += t;
-            v1[i + 2] += t;
-            v1[i + 4] -= t;
-            ans += t;
-        }
-    }
-    for (auto &&i : v1)
-    {
-        cout << i << " ";
-    }
-    cout << endl;
-    for (auto &&i : v2)
-    {
-        cout << i << " ";
-    }
-    cout << endl;
-
-    return ans;
+    return ret;
 }
 
 void run()
 {
+    int n, m;
     scanf("%d%d", &n, &m);
     for (int i = 0; i < n; i++)
     {
-        arr[i].clear();
+        arr[min(i, 2)].clear();
+        arr[min(i, 2)].push_back(i + 1);
         for (int j = 0, v; j < m; j++)
         {
             scanf("%d", &v);
-            arr[i].push_back(v);
+            arr[min(i, 2)].push_back(v);
         }
-    }
-    // for (int i = 0; i < n; i++)
-    // {
-    //     for (int j = 0; j < n; j++)
-    //     {
-    //         cout << i << " " << j << " " << cmp(arr[j], arr[i]) << endl;
-    //     }
-    // }
-    // cout << "-------------------------\n";
-    int k = -1;
-    for (int i = 1; i < n; i++)
-    {
-        bool c = cmp(arr[0], arr[i]);
-        if (!c)
+        if (i >= 2)
         {
-            if (i > 1 || cmp(arr[0], arr[n - 1]))
+            if (val(0) != val(2))
             {
-                k = i;
+                swap(arr[1], arr[2]);
             }
-            else
-            {
-                k = 0;
-            }
-            break;
         }
     }
-    // cnv(arr[k == 0 ? n - 1 : 0], arr[k == 1 ? n - 1 : 1]);
-    // for (int i = 0; i < m; i++)
-    // {
-    //     cout << arr[0][i] << " ";
-    // }
-    // cout << endl;
-
-    ll ans = count(arr[k], arr[k == 0 ? 1 : 0]);
-    printf("%d %lld\n", k + 1, ans);
-    // std::cout << k << endl;
+    ll v0 = val(0), v1 = val(1), v2 = val(2);
+    assert(v0 != v1);
+    if (v0 == v2)
+    {
+        printf("%lld %lld\n", arr[1][0], v1 - v2);
+    }
+    else
+    {
+        printf("%lld %lld\n", arr[0][0], v0 - v2);
+    }
 }
 
 int main()
 {
-    freopen("_input.txt", "r", stdin);
-    freopen("_output.txt", "w", stdout);
+    // freopen("_input.txt", "r", stdin);
+    // freopen("_output.txt", "w", stdout);
     int t = 1;
     scanf("%d", &t);
     while (t--)

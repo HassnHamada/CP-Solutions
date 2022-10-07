@@ -1,32 +1,33 @@
 #include <bits/stdc++.h>
 using namespace std;
 typedef long long ll;
+typedef unsigned long long ull;
 
-const int N = 5e2 + 10, M = 10, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
+const int N = 5e2 + 10, M = 2, MOD = 998244353, HV = 151, INF = 0x3f3f3f3f;
+
+int prv[N], cap[N][N];
 
 vector<int> grf[N];
-int prv[N], cap[N][N];
 
 bool bfs(int s, int e)
 {
     memset(prv, -1, sizeof(prv));
     queue<int> q;
-    q.push(s);
+    q.emplace(s);
     while (!q.empty())
     {
-        int n = q.front();
+        auto n = q.front();
         q.pop();
-        for (auto &&j : grf[n])
+        for (auto &&i : grf[n])
         {
-            int i = abs(j);
             if (i != s && prv[i] == -1 && cap[n][i])
             {
                 prv[i] = n;
-                q.push(i);
                 if (i == e)
                 {
                     return true;
                 }
+                q.push(i);
             }
         }
     }
@@ -35,45 +36,29 @@ bool bfs(int s, int e)
 
 bool vis[N];
 
-void dfs(int n, int s, int e, vector<vector<int>> &ans)
+void dfs(int n, vector<int> &out)
 {
-    if (n == e)
-    {
-        ans.back().push_back(n);
-        return;
-    }
     vis[n] = true;
+    out.push_back(n);
     for (auto &&i : grf[n])
     {
-        if (i < 0 || cap[n][i] || vis[i])
+        if (!vis[i] && cap[n][i])
         {
-            continue;
-        }
-        if (n == s)
-        {
-            ans.emplace_back();
-        }
-        ans.back().push_back(n);
-        dfs(i, s, e, ans);
-        i *= -1;
-        if (n != s)
-        {
-            break;
+            dfs(i, out);
         }
     }
-    vis[n] = false;
 }
 
 void run()
 {
     int n, m;
     scanf("%d%d", &n, &m);
-    for (int i = 0, u, v; i < m; i++)
+    for (int i = 1, a, b; i <= m; i++)
     {
-        scanf("%d%d", &u, &v);
-        grf[u].push_back(v);
-        grf[v].push_back(-u);
-        cap[u][v] = 1;
+        scanf("%d%d", &a, &b);
+        grf[a].push_back(b);
+        grf[b].push_back(a);
+        cap[a][b] = cap[b][a] = 1;
     }
     while (bfs(1, n))
     {
@@ -85,16 +70,24 @@ void run()
             c = prv[c];
         }
     }
-    vector<vector<int>> ans;
-    dfs(1, 1, n, ans);
-    printf("%d\n", (int)ans.size());
-    for (auto &&i : ans)
+    vector<int> out;
+    dfs(1, out);
+    vector<pair<int, int>> ans;
+    for (auto &&i : out)
     {
-        printf("%d\n", (int)i.size());
-        for (auto &&j : i)
+        for (auto &&j : grf[i])
         {
-            printf("%d%c", j, " \n"[j == n]);
+            if (!vis[j])
+            {
+                assert(cap[i][j] == 0);
+                ans.emplace_back(i, j);
+            }
         }
+    }
+    printf("%d\n", (int)ans.size());
+    for (auto &&[a, b] : ans)
+    {
+        printf("%d %d\n", a, b);
     }
 }
 

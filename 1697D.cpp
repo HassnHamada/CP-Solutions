@@ -2,73 +2,89 @@
 using namespace std;
 typedef long long ll;
 
-const int N = 1e3 + 10, M = 128, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
+const int N = 1e3 + 10, M = 26, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
 char ans[N];
 map<pair<int, int>, int> mmm;
+int chr[M], srt[M];
+
+// int ask(int i, int j)
+// {
+//     assert(i <= j);
+//     if (mmm.find({i, j}) == mmm.end())
+//     {
+//         if (i == j)
+//         {
+//             mmm[{i, j}] = 1;
+//         }
+//         else
+//         {
+//             printf("? 2 %d %d\n", i, j);
+//             fflush(stdout);
+//             scanf("%d", &mmm[{i, j}]);
+//         }
+//     }
+//     return mmm[{i, j}];
+// }
 
 int ask(int i, int j)
 {
     assert(i <= j);
-    if (mmm.find({i, j}) == mmm.end())
-    {
-        if (i == j)
-        {
-            mmm[{i, j}] = 1;
-        }
-        else
-        {
-            printf("? 2 %d %d\n", i, j);
-            fflush(stdout);
-            scanf("%d", &mmm[{i, j}]);
-        }
-    }
-    return mmm[{i, j}];
+    printf("? 2 %d %d\n", i, j);
+    fflush(stdout);
+    int v;
+    scanf("%d", &v);
+    return v;
 }
 
-int nxt(int i, int n)
+int nxt(int i, int n, int v)
 {
-    int l = i + 1, h = n + 1;
+    copy(chr, chr + M, srt);
+    sort(srt, srt + M);
+    assert(lower_bound(srt, srt + M, INF) - srt == v);
+    int l = 0, h = v - 1;
     while (l < h)
     {
-        int m = (h - l) / 2 + l;
-        int u = ask(i, m), v = ask(i + 1, m);
-        assert(u >= v);
-        if (u == v)
+        int m = (h - l + 1) / 2 + l;
+        int u = ask(srt[m], n);
+        assert(v - m >= 1);
+        assert(u >= v - m);
+        if (u == v - m)
         {
-            h = m;
+            l = m;
         }
         else
         {
-            l = m + 1;
+            h = m - 1;
         }
     }
-    return l;
+    return srt[l];
 }
 
 void run()
 {
+    memset(chr, 0x3f, sizeof(chr));
     int n;
     scanf("%d", &n);
-    for (int i = 0; i < n; i++)
+    for (int i = 0, cc = 0; i < n; i++)
     {
-        if (ans[i])
+        assert(!ans[i]);
+        int nc = ask(1, i + 1); // O(n)
+        if (nc == cc + 1)
         {
-            continue;
+            printf("? 1 %d\n", i + 1); // O(26)
+            fflush(stdout);
+            scanf("\n%c", ans + i);
+            cc++;
+        }
+        else if (nc == cc)
+        {
+            ans[i] = ans[nxt(0, i + 1, nc) - 1]; // O(n * log(26))
         }
         else
         {
-            printf("? 1 %d\n", i + 1);
-            fflush(stdout);
-            scanf("\n%c", ans + i);
-            for (int j = i + 1; j < n;)
-            {
-                j = nxt(j, n);
-                if (j <= n)
-                {
-                    ans[j - 1] = ans[i];
-                }
-            }
+            assert(false);
         }
+        chr[ans[i] - 'a'] = i + 1;
     }
     printf("! %s\n", ans);
 }

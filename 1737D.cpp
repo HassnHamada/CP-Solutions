@@ -6,106 +6,67 @@ typedef unsigned long long ull;
 const int N = 5e2 + 10, M = 3e5, MOD = 998244353, HV = 151, INF = 0x3f3f3f3f;
 
 vector<int> grf[N];
-
-struct Edge
-{
-    ll u, v, w;
-} edg[M];
-
-int vis[N], vid;
-
-ll dfs(int c, int t, ll r, bool s)
-{
-    if (c == t)
-    {
-        return r;
-    }
-    vis[c] = vid;
-    ll ret = -1;
-    for (auto &&idx : grf[c])
-    {
-        auto [u, v, w] = edg[idx];
-        if (u == c)
-        {
-            swap(u, v);
-        }
-        if (vis[u] == vid)
-        {
-            continue;
-        }
-        if (s)
-        {
-            ll res = dfs(u, t, r, false);
-            if (res == -1)
-            {
-                continue;
-            }
-            if (ret == -1)
-            {
-                ret = res;
-            }
-            else
-            {
-                ret = min(ret, res);
-            }
-        }
-        else
-        {
-            ll res_1 = dfs(u, t, r + w, false),
-               res_2 = dfs(u, t, r + 2 * w, true);
-            if (res_1 == -1 && res_2 == -1)
-            {
-                continue;
-            }
-            if (res_1 == -1 || res_2 == -1)
-            {
-                if (res_1 == -1)
-                {
-                    swap(res_1, res_2);
-                }
-                if (ret == -1)
-                {
-                    ret = res_1;
-                }
-                else
-                {
-                    ret = min(ret, res_1);
-                }
-            }
-            else
-            {
-                if (ret == -1)
-                {
-                    ret = min(res_1, res_2);
-                }
-                else
-                {
-                    ret = min({ret, res_1, res_2});
-                }
-            }
-        }
-    }
-    return ret;
-}
+int cst[N][N], dis[N][N];
 
 void run()
 {
     int n, m;
     scanf("%d%d", &n, &m);
-    for (int i = 1; i <= m; i++)
+    memset(cst, 0x3f, sizeof(cst));
+    memset(dis, 0x3f, sizeof(dis));
+    for (int i = 0; i < N; i++)
     {
-        scanf("%lld%lld%lld", &edg[i].u, &edg[i].v, &edg[i].w);
-        grf[edg[i].u].push_back(i);
-        grf[edg[i].v].push_back(i);
+        grf[i].clear();
+        dis[i][i] = 0;
     }
-    vid++;
-    printf("%lld\n", dfs(1, n, 0, false));
+    for (int i = 0, u, v, w; i < m; i++)
+    {
+        scanf("%d%d%d", &u, &v, &w);
+        grf[--u].push_back(--v);
+        grf[v].push_back(u);
+        // assert(cst[u][v] == cst[v][u]);
+        // assert(dis[u][v] == dis[v][u]);
+        cst[u][v] = cst[v][u] = min(cst[u][v], w);
+        dis[u][v] = dis[v][u] = 1;
+    }
+    for (int k = 0; k < n; k++)
+    {
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                dis[i][j] = min(dis[i][j], dis[i][k] + dis[k][j]);
+            }
+        }
+    }
+    // for (int i = 0; i < n; i++)
+    // {
+    //     for (int j = 0; j < n; j++)
+    //     {
+    //         assert(dis[i][j] != INF);
+    //     }
+    // }
+
+    ll ans = INT64_MAX;
+    for (int i = 0; i < n; i++)
+    {
+        for (auto &&j : grf[i])
+        {
+            assert(cst[i][j] < INF);
+            ans = min(ans, (min(dis[i][0] + dis[j][n - 1], dis[i][n - 1] + dis[j][0]) + 1ll) * cst[i][j]);
+            for (int k = 0; k < n; k++)
+            {
+                ans = min(ans, (min(dis[i][k], dis[j][k]) + dis[k][n - 1] + dis[k][0] + 2ll) * cst[i][j]);
+            }
+        }
+    }
+    printf("%lld\n", ans);
 }
 
 int main()
 {
-    freopen("_input.txt", "r", stdin);
-    freopen("_output.txt", "w", stdout);
+    // freopen("_input.txt", "r", stdin);
+    // freopen("_output.txt", "w", stdout);
     int t = 1;
     scanf("%d", &t);
     while (t--)

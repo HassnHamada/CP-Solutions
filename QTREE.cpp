@@ -2,16 +2,10 @@
 using namespace std;
 typedef long long ll;
 
-#pragma GCC optimize("-Ofast")
-#pragma GCC target("sse,sse2,sse3,ssse3,sse4,sse4.2,popcnt,abm,mmx,avx2,tune=native")
-#pragma GCC optimize("-ffast-math")
-#pragma GCC optimize("-funroll-loops")
-#pragma GCC optimize("-funroll-all-loops,-fpeel-loops,-funswitch-loops")
-
-const int N = 2e5 + 10, M = 20, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
+const int N = 1e4 + 10, M = 14, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
 
 int arr[N], sz[N], hvy[N], ids[N], id, hed[N], per[N][M], seg[1 << M], dep[N];
-vector<int> tre[N];
+vector<pair<int, int>> tre[N];
 
 void dfs(int n, int p)
 {
@@ -19,12 +13,13 @@ void dfs(int n, int p)
     hvy[n] = -1;
     per[n][0] = p;
     dep[n] = dep[p] + 1;
-    for (auto &&i : tre[n])
+    for (auto &&[i, j] : tre[n])
     {
         if (i == p)
         {
             continue;
         }
+        arr[i] = j;
         dfs(i, n);
         sz[n] += sz[i];
         if (hvy[n] == -1 || sz[i] > sz[hvy[n]])
@@ -43,7 +38,7 @@ void hld(int n, int p, int h)
     {
         hld(hvy[n], n, h);
     }
-    for (auto &&i : tre[n])
+    for (auto &&[i, j] : tre[n])
     {
         if (i == p || i == hvy[n])
         {
@@ -53,35 +48,47 @@ void hld(int n, int p, int h)
     }
 }
 
-int lca(int a, int b)
+pair<int, int> lca(int a, int b)
 {
-    if (dep[b] > dep[a])
-    {
-        swap(a, b);
-    }
-    assert(dep[a] >= dep[b]);
     for (int i = M - 1; ~i; i--)
     {
         if (dep[per[a][i]] >= dep[b])
         {
             a = per[a][i];
         }
-    }
-    assert(dep[a] == dep[b]);
-    if (a == b)
-    {
-        return a;
-    }
-    for (int i = M - 1; ~i; i--)
-    {
-        if (per[a][i] != per[b][i])
+        if (dep[per[b][i]] >= dep[a])
         {
-            a = per[a][i];
             b = per[b][i];
         }
     }
-    assert(per[a][0] == per[b][0]);
-    return per[a][0];
+    assert(dep[a] == dep[b]);
+    if (a != b)
+    {
+        for (int i = M - 1; ~i; i--)
+        {
+            if (per[a][i] != per[b][i])
+            {
+                a = per[a][i];
+                b = per[b][i];
+            }
+        }
+        assert(per[a][0] == per[b][0]);
+    }
+    return {a, b};
+}
+
+int lca_(int a, int b)
+{
+    assert(dep[a] < dep[b]);
+    for (int i = M - 1; ~i; i--)
+    {
+        if (dep[per[b][i]] > dep[a])
+        {
+            b = per[b][i];
+        }
+    }
+    assert(per[b][0] == a);
+    return b;
 }
 
 void update(int qi, int qv, int i, int s, int e)
@@ -137,19 +144,19 @@ int query(int a, int b, int n)
     return ans;
 }
 
+char buf[N];
+pair<int, int> edg[N];
+
 void run()
 {
-    int n, q;
-    scanf("%d%d", &n, &q);
-    for (int i = 1; i <= n; i++)
+    int n;
+    scanf("%d", &n);
+    for (int i = 0, u, v, w; i < n - 1; i++)
     {
-        scanf("%d", arr + i);
-    }
-    for (int i = 0, u, v; i < n - 1; i++)
-    {
-        scanf("%d%d", &u, &v);
-        tre[u].push_back(v);
-        tre[v].push_back(u);
+        scanf("%d%d%d", &u, &v, &w);
+        tre[u].emplace_back(v, w);
+        tre[v].emplace_back(u, w);
+        edg[i] = {u, v};
     }
     dfs(1, 0);
     hld(1, 0, 1);
@@ -160,27 +167,54 @@ void run()
             per[j][i] = per[per[j][i - 1]][i - 1];
         }
     }
-    for (int i = 1; i <= n; i++)
+    for (int i = 2; i <= n; i++)
     {
         update(ids[i], arr[i], 0, 0, n - 1);
     }
-    while (q--)
+    while (true)
     {
-        int t;
-        scanf("%d", &t);
-        if (t & 1)
+        scanf("%s", buf);
+        if (buf[0] == 'C')
         {
             int s, x;
             scanf("%d%d", &s, &x);
-            update(ids[s], x, 0, 0, n - 1);
+            auto [c, d] = edg[s - 1];
+            assert(abs(dep[c] - dep[d]) == 1);
+            update(ids[dep[c] > dep[d] ? c : d], x, 0, 0, n - 1);
         }
-        else
+        else if (buf[0] == 'Q')
         {
             int a, b;
             scanf("%d%d", &a, &b);
-            int c = lca(a, b);
-            printf("%d ", max(query(a, c, n), query(b, c, n)));
+            assert(a != b);
+            auto [c, d] = lca(a, b);
+            if (c == d)
+            {
+                assert(dep[a] != dep[b]);
+                if (dep[a] > dep[b])
+                {
+                    swap(a, b);
+                }
+                printf("%d\n", query(lca_(a, b), d, n));
+            }
+            else
+            {
+                printf("%d\n", max(query(c, a, n), query(d, b, n)));
+            }
         }
+        else if (buf[0] == 'D')
+        {
+            break;
+        }
+        else
+        {
+            assert(false);
+        }
+    }
+    id = 0;
+    for (int i = 1; i <= n; i++)
+    {
+        tre[i].clear();
     }
 }
 
@@ -189,7 +223,7 @@ int main()
     // freopen("_input.txt", "r", stdin);
     // freopen("_output.txt", "w", stdout);
     int t = 1;
-    // scanf("%d", &t);
+    scanf("%d", &t);
     while (t--)
     // while (scanf("%d", &n), n)
     {

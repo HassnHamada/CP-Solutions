@@ -1,61 +1,74 @@
-// #include <bits/stdc++.h>
-#include "stdc++.h"
+#include <bits/stdc++.h>
 using namespace std;
-// typedef long long int ll;
-// #include <chrono>
-// using namespace std::chrono;
+typedef long long ll;
 
-const int N = 1e6 + 10;
-int dp[N];
+const int N = 1e2 + 10, M = 14, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
 
-int calc(int n)
+// bitset<N> dp;
+
+// void pre()
+// {
+//     for (int i = 3; i < N; i++)
+//     {
+//         for (int j = 1; j < (i + 1) / 2; j++)
+//         {
+//             if (dp[j] == dp[i - j])
+//             {
+//                 dp[i] = 1;
+//                 break;
+//             }
+//         }
+//     }
+// }
+
+map<int, bool> dp;
+
+bool win(int n, bool p = true, bool t = true)
 {
-    assert(n);
-    if (~dp[n])
+    if (n <= 2)
     {
-        return dp[n];
+        return !p;
     }
-    int ret = 0;
-    for (int i = 1; i < n / 2; i++)
+    int k = (((n << 1) | p) << 1) | t;
+    if (dp.find(k) != dp.end())
     {
-        ret |= dp[i] ^ dp[n - i];
+        return dp[k];
     }
-    return ret;
+    for (int j = 1; j < (n + 1) / 2; j++)
+    {
+        if ((win(j, !p, !t) == p && win(n - j, !p, !t) == p) ||
+            (win(j, !p, t) != p && win(n - j, p, t) == p) ||
+            (win(n - j, !p, t) != p && win(j, p, t) == p))
+        {
+            return dp[k] = p;
+        }
+    }
+    return dp[k] = !p;
 }
 
 void run()
 {
-    int n;
-    cin >> n;
-    dp[0] = dp[1] = 0;
-    for (int i = 2; i < N; i++)
+    // int n;
+    // scanf("%d", &n);
+    for (int i = 1; i < N; i++)
     {
-        dp[i] = calc(i)?0:1;
-        cout << i << " " << dp[i] << endl;
+        cout << i << " " << win(i) << endl;
     }
-
-    // cout << endl;
-    // cout << (n > N || dp[n] ? "first" : "second") << endl;
+    // win(10);
+    // printf(n >= N || dp[n] ? "first\n" : "second\n");
 }
 
-int main(int argc, char const *argv[])
+int main()
 {
-    // auto start = high_resolution_clock::now();
-    freopen(".\\_input.txt", "r", stdin);
-    freopen(".\\_output.txt", "w", stdout);
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    cout.tie(NULL);
-    // cout << setprecision(6) << fixed;
-    memset(dp, -1, sizeof(dp));
+    // pre();
+    freopen("_input.txt", "r", stdin);
+    freopen("_output.txt", "w", stdout);
     int t = 1;
-    cin >> t;
+    // scanf("%d", &t);
     while (t--)
+    // while (scanf("%d", &n), n)
     {
         run();
     }
-    // auto stop = high_resolution_clock::now();
-    // auto duration = duration_cast<microseconds>(stop - start);
-    // cout << "Time taken by function: " << duration.count() << " microseconds" << endl;
     return 0;
 }

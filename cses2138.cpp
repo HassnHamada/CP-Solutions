@@ -10,21 +10,19 @@ typedef long long ll;
 
 const int N = 5e4 + 10, M = 3e1 + 10, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
 
-int sz[N];
+bitset<N> ans[N];
 vector<int> tre[N];
 
 void dfs(int n)
 {
-    assert(sz[n] == 0);
-    sz[n] = 1;
+    ans[n][n] = 1;
     for (auto &&i : tre[n])
     {
-        if (sz[i] == 0)
+        if (ans[i][i] == 0)
         {
             dfs(i);
         }
-        
-        sz[n] += sz[i];
+        ans[n] |= ans[i];
     }
 }
 
@@ -39,7 +37,7 @@ void run()
     }
     for (int i = 1; i <= n; i++)
     {
-        if (sz[i])
+        if (ans[i][i])
         {
             continue;
         }
@@ -47,14 +45,14 @@ void run()
     }
     for (int i = 1; i <= n; i++)
     {
-        printf("%d%c", sz[i], " \n"[i == n]);
+        printf("%d%c", (int)ans[i].count(), " \n"[i == n]);
     }
 }
 
 int main()
 {
-    freopen("_output.txt", "w", stdout);
-    freopen("_input.txt", "r", stdin);
+    // freopen("_output.txt", "w", stdout);
+    // freopen("_input.txt", "r", stdin);
     int t = 1;
     // scanf("%d", &t);
     while (t--)

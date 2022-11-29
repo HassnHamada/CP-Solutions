@@ -10,14 +10,24 @@ def main():
         tre[v].append((u, w))
 
     def dfs(n, p=0, c=0, *, b=None, out: dict = None) -> None:
-        if b is not None and n == b:
-            return
-        assert n not in out
-        out[n] = c
-        for v, w in tre[n]:
-            if v == p:
+        stk = [(n, p, c, ((i, j) for i, j in tre[n]))]
+        while len(stk) != 0:
+            n, p, c, gen = stk[-1]
+            if b is not None and n == b:
+                stk.pop()
                 continue
-            dfs(v, n, c ^ w, b=b, out=out)
+            if n not in out:
+                out[n] = c
+            else:
+                assert out[n] == c
+            try:
+                v, w = next(gen)
+                while v == p:
+                    v, w = next(gen)
+            except StopIteration:
+                stk.pop()
+                continue
+            stk.append((v, n, c ^ w, ((i, j) for i, j in tre[v])))
 
     s_a, s_b = dict(), dict()
     dfs(a, b=b, out=s_a), dfs(b, out=s_b)

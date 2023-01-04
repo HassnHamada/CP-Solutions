@@ -4,54 +4,16 @@ typedef long long ll;
 
 const int N = 3e3 + 10, M = 1 << 12, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f, EMP = -1;
 
-#pragma GCC optimize("O3")
-#pragma GCC optimize("-Ofast")
-#pragma GCC target("sse,sse2,sse3,ssse3,sse4,sse4.2,popcnt,abm,mmx,avx2,tune=native")
-#pragma GCC optimize("-ffast-math")
-#pragma GCC optimize("-funroll-loops")
-#pragma GCC optimize("-funroll-all-loops,-fpeel-loops,-funswitch-loops")
+ll arr[N], dp[N][N], opt[N][N], pre[N][N], suf[N][N], cst[N][N], cst_opt[N][N];
 
-ll arr[N], dp[N][N], pre[N][N], suf[N][N], cst[N][N];
-
-int bs(int l, int h, int s, int e)
+ll f(int s, int m, int e)
 {
-    while (l < h)
-    {
-        int m = (h - l) / 3;
-        ll a = pre[s][l + m - 1] + suf[l + m][e],
-           b = pre[s][h - m - 1] + suf[h - m][e],
-           c = pre[s][l - 1] + suf[l][e];
-        if (a <= b || c <= min(a, b))
-        {
-            h = h - m - 1;
-        }
-        else
-        {
-            l = l + m + 1;
-        }
-    }
-    assert(l == h);
-    return l;
+
+    return pre[s][m - 1] + suf[m][e];
 }
-
-int bs_(int l, int h, int k, int s)
+ll g(int k, int s, int e)
 {
-    while (l < h)
-    {
-        int m = (h - l) / 3;
-        ll a = dp[k][l + m] + cst[s][l + m],
-           b = dp[k][h - m] + cst[s][h - m],
-           c = dp[k][l] + cst[s][l];
-        if (a <= b || c <= min(a, b))
-        {
-            h = h - m - 1;
-        }
-        else
-        {
-            l = l + m + 1;
-        }
-    }
-    return l;
+    return dp[k][e] + cst[s][e];
 }
 
 void run()
@@ -73,31 +35,55 @@ void run()
     }
     for (int i = 0; i < n; i++)
     {
-        for (int j = i + 1, l = i; j <= n; j++)
+        cst_opt[i][i + 1] = i + 1;
+    }
+    for (int i = 2; i <= n; i++)
+    {
+        for (int j = 0; j <= n - i; j++)
         {
-            l = bs(l, j, i, j);
-            cst[i][j] = pre[i][l - 1] + suf[l][j];
+            cst_opt[j][j + i] = j + 1;
+            for (int l = cst_opt[j][j + i - 1]; l <= cst_opt[j + 1][j + i]; l++)
+            {
+                if (f(j, cst_opt[j][j + i], j + i) > f(j, l, j + i))
+                {
+                    cst_opt[j][j + i] = l;
+                }
+            }
+            cst[j][j + i] = f(j, cst_opt[j][j + i], j + i);
         }
     }
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i <= n; i++)
     {
-        dp[0][i] = cst[i][n];
+        dp[1][i] = cst[i][n];
     }
-    for (int i = 1; i < k; i++)
+    for (int i = 1; i < n; i++)
     {
-        for (int j = 0, l = 1; j < n - i; j++)
+        opt[i + 1][n - i - 1] = n - i;
+    }
+    for (int i = 2; i < n; i++)
+    {
+        for (int j = 1; j <= n - i; j++)
         {
-            l = bs_(l, n - i, i - 1, j);
-            dp[i][j] = dp[i - 1][l] + cst[j][l];
+            int x = j + 1, y = n - j - i;
+            assert(x >= 2 && x <= n);
+            assert(y >= 0 && y < n - i);
+            for (int l = max(opt[x + 1][y], opt[x][y] = y + 1); l <= opt[x][y + 1]; l++)
+            {
+                if (g(x - 1, y, opt[x][y]) > g(x - 1, y, l))
+                {
+                    opt[x][y] = l;
+                }
+            }
+            dp[x][y] = g(x - 1, y, opt[x][y]);
         }
     }
-    printf("%lld\n", dp[k - 1][0]);
+    printf("%lld\n", dp[k][0]);
 }
 
 int main()
 {
-    freopen("_output.txt", "w", stdout);
-    freopen("_input.txt", "r", stdin);
+    // freopen("_output.txt", "w", stdout);
+    // freopen("_input.txt", "r", stdin);
     int t = 1;
     // scanf("%d", &t);
     while (t--)

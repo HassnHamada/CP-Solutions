@@ -38,7 +38,7 @@ void run()
     sort(qqq, qqq + q);
     for (int i = 0, j = 0; i < q; i++)
     {
-        while (j < qqq[i].v - 1 && dp[n - j] + j < qqq[i].v)
+        while (j + 1 < qqq[i].v && dp[n - j] + j < qqq[i].v)
         {
             j++;
         }
@@ -52,8 +52,8 @@ void run()
 
 int main()
 {
-    // freopen("_input.txt", "r", stdin);
-    // freopen("_output.txt", "w", stdout);
+    freopen("_input.txt", "r", stdin);
+    freopen("_output.txt", "w", stdout);
     int t = 1;
     // scanf("%d", &t);
     while (t--)

@@ -4,17 +4,17 @@ typedef long long ll;
 
 const int N = 1e5 + 10, M = 1e6 + 10, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
 
-std::vector<int> prime;
-bool is_composite[N];
+vector<int> prime;
+bool is_composite[M];
 
-void linear_sieve(int n)
+void linear_sieve(int n = M)
 {
     std::fill(is_composite, is_composite + n, false);
     for (int i = 2; i < n; ++i)
     {
         if (!is_composite[i])
             prime.push_back(i);
-        for (int j = 0; j < prime.size() && i * prime[j] < n; ++j)
+        for (int j = 0; j < (int)prime.size() && i * prime[j] < n; ++j)
         {
             is_composite[i * prime[j]] = true;
             if (i % prime[j] == 0)
@@ -23,40 +23,12 @@ void linear_sieve(int n)
     }
 }
 
-int arr[N], div_[M];
-
-void sieve()
+ll nC2(ll n)
 {
-    for (ll i = 2; i < M; i++)
-    {
-        if (div_[i])
-        {
-            continue;
-        }
-        div_[i] = i;
-        for (ll j = i * i; j < M; j += i)
-        {
-            div_[j] = i;
-        }
-    }
+    return n * (n - 1) / 2;
 }
 
-set<int> get_div(int n)
-{
-    // set<int> ret = {n};
-    set<int> ret;
-    while (n != 1)
-    {
-        // cout << n << " " << div_[n] << endl;
-        assert(div_[n]);
-        assert(n % div_[n] == 0);
-        ret.insert(n);
-        ret.insert(div_[n]);
-        // ret.insert(n /= div_[n]);
-        n /= div_[n];
-    }
-    return ret;
-}
+int arr[N], frq[M], cnt[M];
 
 void run()
 {
@@ -65,43 +37,36 @@ void run()
     for (int i = 0; i < n; i++)
     {
         scanf("%d", arr + i);
+        frq[arr[i]] += 1;
     }
-    sort(arr, arr + n);
-    for (int i = 0; i < n; i++)
+    linear_sieve();
+    ll ans = nC2(n);
+    for (int i = 2; i < M; i++)
     {
-        cout << arr[i] << " ";
-    }
-    cout << endl;
-    sieve();
-    ll ans = 0;
-    for (int i = 1; i < n; i++)
-    {
-        // cout << i << " " << arr[i] << endl;
-        if (arr[i] == 1)
+        // if (is_composite[i])
+        // {
+        //     continue;
+        // }
+        // int cnt = 0;
+        for (int j = i; j < M; j += i)
         {
-            continue;
+            cnt[i] += frq[j];
         }
-        int tem = 0;
-        for (auto &&j : get_div(arr[i]))
-        {
-            // cout << "nuin\n";
-            // cout << j << " ";
-            auto l = lower_bound(arr, arr + i, j),
-                 h = upper_bound(arr, arr + i, j);
-            tem += h - l;
-        }
-        // cout << endl;
-        assert(i >= tem);
-        ans += i - tem;
-        cout << i - tem << endl;
+        // ans -= nC2(cnt);
     }
+    set<int> nums;
+        for (int i = 0; i * i <= n; i++)
+        {
+            /* code */
+        }
+
     printf("%lld\n", ans);
 }
 
 int main()
 {
-    freopen("_input.txt", "r", stdin);
-    freopen("_output.txt", "w", stdout);
+    // freopen("_input.txt", "r", stdin);
+    // freopen("_output.txt", "w", stdout);
     int t = 1;
     // scanf("%d", &t);
     while (t--)

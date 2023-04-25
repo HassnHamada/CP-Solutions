@@ -50,12 +50,13 @@ void run()
 
 int main()
 {
-    // freopen("_input.txt", "r", stdin);
-    // freopen("_output.txt", "w", stdout);
+#ifndef ONLINE_JUDGE
+    freopen("_output.txt", "w", stdout);
+    freopen("_input.txt", "r", stdin);
+#endif
     int t = 1;
     // scanf("%d", &t);
     while (t--)
-    // while (scanf("%d", &n), n)
     {
         run();
     }

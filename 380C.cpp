@@ -2,184 +2,61 @@
 using namespace std;
 typedef long long ll;
 
-const int N = 1e6 + 10, M = 1e5 + 10, Q = 1000, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
+const int N = 1 << 20, M = 1e5 + 10, Q = 1000, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
 
 char str[N];
-
-struct Query
+int n;
+struct T
 {
-    int l, r, i;
-    bool operator<(const Query &other) const
-    {
-        if (this->l / Q == other.l / Q)
-        {
-            return this->r < other.r;
-        }
-        return this->l / Q < other.l / Q;
-    }
-} queries[M];
+    int l, r, v;
+} tre[N << 1];
 
-int s, e, usd[N], curAns;
-deque<int> pre, suf;
-
-void add(int i)
+void build(int i = 0, int s = 0, int e = n - 1)
 {
-    // cerr << "Add " << i << endl;
-    assert(i == s || i == e - 1);
-    if (i == s)
+    if (s == e)
     {
-        if (str[i] == '(')
-        {
-            if (suf.empty())
-            {
-                pre.push_front(i);
-            }
-            else
-            {
-                assert(usd[i] == -1);
-                assert(usd[suf.front()] == -1);
-                usd[i] = suf.front();
-                usd[suf.front()] = i;
-                suf.pop_front();
-                curAns += 2;
-            }
-        }
-        else
-        {
-            assert(str[i] == ')');
-            suf.push_front(i);
-        }
+        tre[i] = {str[s] == '(', str[s] == ')', 0};
+        return;
     }
-    else
-    {
-        if (str[i] == '(')
-        {
-            pre.push_back(i);
-        }
-        else
-        {
-            assert(str[i] == ')');
-            if (pre.empty())
-            {
-                suf.push_back(i);
-            }
-            else
-            {
-                assert(usd[i] == -1);
-                assert(usd[pre.back()] == -1);
-                usd[i] = pre.back();
-                usd[pre.back()] = i;
-                pre.pop_back();
-                curAns += 2;
-            }
-        }
-    }
+    int l = 2 * i + 1, r = l + 1, m = (e - s) / 2 + s;
+    build(l, s, m);
+    build(r, m + 1, e);
+    int mn = min(tre[l].l, tre[r].r);
+    tre[i] = {tre[l].l + tre[r].l - mn,
+              tre[l].r + tre[r].r - mn,
+              tre[l].v + tre[r].v + mn};
 }
 
-void del(int i)
+T get(int qs, int qe, int i = 0, int s = 0, int e = n - 1)
 {
-    // cerr << "Del " << i << endl;
-    assert(i == s - 1 || i == e);
-    if (i == s - 1)
+    if (s > qe || e < qs)
     {
-        if (str[i] == '(')
-        {
-            if (usd[i] == -1)
-            {
-                assert(pre.front() == i);
-                pre.pop_front();
-            }
-            else
-            {
-                int j = usd[i];
-                assert(usd[j] == i);
-                usd[i] = usd[j] = -1;
-                assert(str[j] == ')');
-                assert(suf.empty() || suf.front() > j);
-                suf.push_front(j);
-                curAns -= 2;
-            }
-        }
-        else
-        {
-            assert(str[i] == ')');
-            assert(usd[i] == -1);
-            suf.pop_front();
-        }
+        return {0, 0, 0};
     }
-    else
+    if (s >= qs && e <= qe)
     {
-        if (str[i] == '(')
-        {
-            assert(usd[i] == -1);
-            pre.pop_back();
-        }
-        else
-        {
-            assert(str[i] == ')');
-            if (usd[i] == -1)
-            {
-                assert(suf.back() == i);
-                suf.pop_back();
-            }
-            else
-            {
-                int j = usd[i];
-                assert(usd[j] == i);
-                usd[i] = usd[j] = -1;
-                assert(str[j] == '(');
-                assert(pre.empty() || pre.back() < j);
-                pre.push_back(j);
-                curAns -= 2;
-            }
-        }
+        return tre[i];
     }
-}
-
-void updateSE(int qs, int qe)
-{
-    while (e < qe + 1)
-    {
-        add(e++);
-    }
-    while (s > qs)
-    {
-        add(--s);
-    }
-    while (s < qs)
-    {
-        del(s++);
-    }
-    while (e > qe + 1)
-    {
-        del(--e);
-    }
+    int l = 2 * i + 1, r = l + 1, m = (e - s) / 2 + s;
+    T lq = get(qs, qe, l, s, m), rq = get(qs, qe, r, m + 1, e);
+    int mn = min(lq.l, rq.r);
+    return {lq.l + rq.l - mn,
+            lq.r + rq.r - mn,
+            lq.v + rq.v + mn};
 }
 
 void run()
 {
     scanf("%s", str);
-    // int m, n = strlen(str);
+    n = strlen(str);
+    build();
     int m;
-    memset(usd, -1, sizeof(usd));
     scanf("%d", &m);
-    vector<int> ans(m);
-    for (int i = 0; i < m; i++)
+    while (m--)
     {
-        queries[i].i = i;
-        scanf("%d%d", &queries[i].l, &queries[i].r);
-    }
-    sort(queries, queries + m);
-    for (int i = 0; i < m; i++)
-    {
-        // cerr << queries[i].l << " " << queries[i].r << "\n";
-        updateSE(queries[i].l - 1, queries[i].r - 1);
-        ans[queries[i].i] = curAns;
-        // cerr << curAns << endl;
-    }
-    for (auto &&i : ans)
-    {
-        printf("%d\n", i);
+        int l, r;
+        scanf("%d%d", &l, &r);
+        printf("%d\n", get(l - 1, r - 1).v * 2);
     }
 }
 

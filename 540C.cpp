@@ -1,8 +1,9 @@
 #include <bits/stdc++.h>
+// #include <vector>
 using namespace std;
 typedef long long ll;
 
-const int N = 5e2 + 10, M = 1e6 + 10, MOD = 1e9 + 7, HV = 151, INF = 0x3f3f3f3f;
+const int N = 5e2 + 10;
 
 char brd[N][N];
 vector<pair<int, int>> dir = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
